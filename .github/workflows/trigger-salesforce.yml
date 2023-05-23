@@ -1,0 +1,30 @@
+name: Trigger Automation
+
+on:
+  push:
+    paths:
+      - 'path/to/file' # Replace with the path to the file in the external cloud storage
+
+jobs:
+  trigger_automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Trigger Automation
+        env:
+          FILE_NAME: ${{ github.event.head_commit.modified[0] }}
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.MC_ACCESS_TOKEN }}" \
+            -d '{
+              "ContactKey": "subscriber_key",
+              "EventDefinitionKey": "external_key",
+              "Data": {
+                "customKey": "customValue"
+              }
+            }' \
+            https://your-mc-api-endpoint.com/interaction/v1/events
